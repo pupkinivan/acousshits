@@ -4,8 +4,8 @@ from typing import Optional, Union
 import numpy as np
 from scipy.signal import find_peaks
 
-from aira.utils import convert_ambisonics_a_to_b
-from aira.utils import read_aformat
+from plotting.utils import convert_ambisonics_a_to_b
+from plotting.utils import read_aformat
 
 
 def seconds_to_samples(seconds: float, sample_rate: int) -> int:

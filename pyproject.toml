@@ -6,7 +6,7 @@ authors = ["ivanp <ipupkin@untref.edu.ar>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.9,<3.12"
 numpy = "^1.25.0"
 pandas = "^2.0.3"
 plotly = "^5.15.0"
@@ -14,6 +14,7 @@ matplotlib = "^3.7.2"
 openpyxl = "^3.1.2"
 kaleido = "0.2.1"
 soundfile = "^0.12.1"
+scipy = "^1.11.1"
 
 
 [build-system]
