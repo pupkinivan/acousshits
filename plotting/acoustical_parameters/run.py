@@ -17,11 +17,14 @@ from plotting.acoustical_parameters import (
 )
 from plotting.utils import read_aformat, convert_ambisonics_a_to_b
 
-input_directory = input(
-    "Input directory? [/mnt/Ivan'sDrive/Documents/untref/materias/ima/final/RIRs/subjetivadas]: "
-)
+# default_directory = (
+#     "/mnt/Ivan'sDrive/Documents/untref/materias/ima/final/RIRs/subjetivadas"
+# )
 default_directory = (
-    "/mnt/Ivan'sDrive/Documents/untref/materias/ima/final/RIRs/subjetivadas"
+    "/mnt/Ivan'sDrive/Documents/untref/materias/ima/final/RIRs/objetivas"
+)
+input_directory = input(
+    f"Input directory? [{default_directory}]: "
 )
 input_directory = Path(
     input_directory if input_directory != "" else default_directory

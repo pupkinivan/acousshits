@@ -74,9 +74,10 @@ def lateral_fraction_early(bformat_rir: np.ndarray, sample_rate: int) -> float:
         raise ValueError("Omni portion {} is too close to 0.0".format(omni_portion))
 
     ratio = lateral_portion / omni_portion
-    if np.isclose(ratio, 0.0, 1e-7):
-        return -np.inf
-    return 10 * np.log10(ratio)
+    # if np.isclose(ratio, 0.0, 1e-7):
+    #     return -np.inf
+    # return 10 * np.log10(ratio)
+    return ratio
 
 
 def lateral_fraction_late(bformat_rir: np.ndarray, sample_rate: int) -> float:
@@ -105,9 +106,10 @@ def lateral_fraction_late(bformat_rir: np.ndarray, sample_rate: int) -> float:
         raise ValueError("Omni portion {} is too close to 0.0".format(omni_portion))
 
     ratio = lateral_portion / omni_portion
-    if np.isclose(ratio, 0.0, 1e-7):
-        return -np.inf
-    return 10 * np.log10(ratio)
+    # if np.isclose(ratio, 0.0, 1e-7):
+    #     return -np.inf
+    # return 10 * np.log10(ratio)
+    return ratio
 
 
 def direct_reverberant_ratio(

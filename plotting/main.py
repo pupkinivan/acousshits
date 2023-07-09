@@ -8,9 +8,10 @@ from plotting.plots import (
     plot_lines_with_integration_time,
     plot_iacc_with_integration_time,
     plot_boxplot,
+    plot_distribution,
 )
 
-SAVE = False
+SAVE = True
 SHOW = False
 
 logging.basicConfig(level=logging.INFO)
@@ -28,27 +29,39 @@ logging.basicConfig(level=logging.INFO)
 # T30 subjetivo
 # C50 subjetivo
 # C80 subjetivo
-
-#
-
-# TODO: Missing
+# IACC subjetivo
+# IACC por octava subjetivo
+# - ASW
+# - LEV
 # - STI
 # - SNR
 # - St1, St2
-# - ASW
-# - LEV
+
+# TODO: Missing
 # - LFearly objetivo
 # - LFlate objetivo
 # - DR objetivo
 # - LFearly subjetivo
 # - LFlate subjetivo
 # - DR subjetivo
-# - IACC
-# - IACC por octava
 
-sheets_to_keep = {
+sheets_to_keep = [
+    "STI",
+    "SNR",
+    "Ts",
+    "EDT",
+    "T20",
+    "T30",
+    "C50",
+    "C80",
+    "ST param",
+    "IACC",
+    "IACC oct",
+]
+
+sheet_to_parameter_name = {
     "STI": "STI male/female",  # single number, boxplot
-    "SNR": "SNR",
+    "SNR": "SNR",  #  Discard because XLSX keeps the formula in the interesting column.
     "Ts": "Ts",
     "EDT": "EDT",
     "T20": "T20",
@@ -59,8 +72,8 @@ sheets_to_keep = {
     "ST param": "St1,St2",  # thirds starting from 5; plot separately
     "IACC": "IACC",  # extra: full/early/late; thirds starting from 5. plot early/late/all separately; no seat position. compare integration time.
     "IACC oct": "{} per octave",  # extra: early/late; OCTAVES starting from 5; no seat position. compare integration time.
-    "ASW": "ASW",  # last col; no seat position. compare integration time.
-    "LEV": "LEV",  # last col; no seat position. compare integration time.
+    "ASW": "ASW",  # last col; no seat position. compare integration time. Discard because XLSX keeps the formula in the interesting column.
+    "LEV": "LEV",  # last col; no seat position. compare integration time. Discard because XLSX keeps the formula in the interesting column.
     "LF y DR objetivas": "LF_early,LF_late,DR",  # LF early, LF late y DR
     "LF y DR subjetivas": "LF_early_subjective,LF_late_subjective,DR_subjective",  # LF early, LF late y DR
 }
@@ -173,13 +186,20 @@ likely_frequency_bands = [
 
 
 def read_data_file():
-    return pd.read_excel("./data/data.xlsx", sheet_name=list(sheets_to_keep.keys()))
+    data_dict = pd.read_excel("./data/data.xlsx", sheet_name=sheets_to_keep)
+    data_dict["ASW"] = pd.read_csv("./data/ASW.csv", sep=";")
+    data_dict["LEV"] = pd.read_csv("./data/LEV.csv", sep=";")
+    return data_dict
 
 
 def preprocess_dataframe(df: pd.DataFrame, parameter_name: str) -> pd.DataFrame:
+    def to_numeric_custom(string: str):
+        return string.replace(",", ".")
+
     df = df.rename(
         columns={
             "Medición": "measurement",
+            "Medicion": "measurement",
             "Posición": "microphone_position",
             "Dist a fuente": "distance",
             "T de integ": "integration_time",
@@ -187,6 +207,12 @@ def preprocess_dataframe(df: pd.DataFrame, parameter_name: str) -> pd.DataFrame:
             "Temporalidad": "iacc_type",
         }
     )
+    if "integration_time" in df:
+        numerics = ["int16", "int32", "int64", "float16", "float32", "float64"]
+        if "integration_time" in df.select_dtypes(include=numerics).columns:
+            df["integration_time"] = df["integration_time"].apply(
+                lambda number: str(number)
+            )
     for numerical_column in likely_frequency_bands:
         if numerical_column in df:
             df[numerical_column] = pd.to_numeric(df[numerical_column], errors="raise")
@@ -228,7 +254,7 @@ def main():
     df_dict = read_data_file()
 
     for sheet_name, df in df_dict.items():
-        parameter_name = sheets_to_keep[sheet_name]
+        parameter_name = sheet_to_parameter_name[sheet_name]
         parameter_units = parameters_to_units[parameter_name]
         df = preprocess_dataframe(df, parameter_name)
 
@@ -239,7 +265,8 @@ def main():
             continue
             plot_iacc(df, parameter_name, parameter_units)
         elif parameter_name in plot_group_iacc_globals:
-            plot_global(df, parameter_name, parameter_units)
+            # plot_global(df, parameter_name, parameter_units)
+            plot_distribution(df, parameter_name, parameter_units, parameter_name)
         else:
             logging.warning(
                 "Plotting for parameter %s not implemented yet; skipping...",

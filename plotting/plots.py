@@ -3,7 +3,7 @@ from random import random
 import pandas as pd
 from plotly import graph_objects as go
 import plotly.express as px
-
+from plotly import figure_factory
 
 valid_frequencies = [
     "50",
@@ -314,7 +314,26 @@ def plot_boxplot(
     show: bool = True,
     save: bool = False
 ) -> None:
-    fig = px.box(df, x="integration_time", y=parameter_column)
+    fig = px.box(df, x="integration_time", y=parameter_column, color="integration_time")
+    # fig.update_layout(
+    #     yaxis_title=f"{parameter_name}""
+    # )
+    if show:
+        fig.show()
+    if save:
+        fig.write_image(f"./outputs/{parameter_name}-boxplot.png")
+
+
+def plot_distribution(
+    df: pd.DataFrame,
+    parameter_name: str,
+    parameter_units: str,
+    parameter_column: str,
+    show: bool = True,
+    save: bool = False
+) -> None:
+    fig = px.histogram(df, x=parameter_name, color="integration_time")
+    figure_factory.create_2d_density(x=df["LEV"], y=df["ASW"])
     # fig.update_layout(
     #     yaxis_title=f"{parameter_name}""
     # )
